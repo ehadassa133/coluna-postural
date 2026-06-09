@@ -1,42 +1,32 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-
+<html lang="pt-br">
 <head>
-
 <meta charset="UTF-8">
-
-<title>Coluna Postural</title>
+<title>Monitoramento Postural</title>
 
 <style>
 
 body{
     margin:0;
-    padding:0;
     background:#f2f2f2;
-    overflow:hidden;
     font-family:Arial;
+    text-align:center;
 }
 
-#container{
-    width:100vw;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
+h2{
+    margin-top:20px;
 }
 
 canvas{
     background:white;
-    border-radius:15px;
-    box-shadow:0px 0px 15px rgba(0,0,0,0.15);
+    margin-top:20px;
+    border-radius:10px;
+    box-shadow:0px 0px 10px rgba(0,0,0,0.2);
 }
 
-#info{
-    margin-top:15px;
-    text-align:center;
-    font-size:18px;
-    font-weight:bold;
+#dados{
+    margin-top:20px;
+    font-size:20px;
 }
 
 </style>
@@ -45,285 +35,90 @@ canvas{
 
 <body>
 
-<div id="container">
+<h2>Monitoramento Postural</h2>
 
-<canvas
-id="canvas"
-width="450"
-height="550">
-</canvas>
+<canvas id="canvas" width="500" height="500"></canvas>
 
-<div id="info">
+<div id="dados">
 
-<div>
-Curvatura:
-<span id="curvatura">
-0
-</span>
-°
-</div>
+<p>Curvatura: <span id="curvatura">0</span>°</p>
 
-<div>
-Índice Postural:
-<span id="indice">
-100
-</span>
-%
-</div>
+<p>Status: <span id="status">-</span></p>
 
-<div>
-Status:
-<span id="status">
-POSTURA_CORRETA
-</span>
-</div>
-
-</div>
+<p>Má postura: <span id="contador">0</span></p>
 
 </div>
 
 <script>
 
-//=====================================================
-// VARIÁVEIS
-//=====================================================
+const TOKEN = "42a77494-7495-49db-a47e-ab234bbe00c9";
 
-let x_lombar = 0;
-let y_lombar = 0;
+const URL =
+"https://api.tago.io/data?query=last_value";
 
-let x_meio = 0;
-let y_meio = 7.5;
+let xLombar = 0;
+let yLombar = 0;
 
-let x_superior = 0;
-let y_superior = 15;
+let xMeio = 0;
+let yMeio = 7.5;
+
+let xSuperior = 0;
+let ySuperior = 15;
 
 let curvatura = 0;
-let indice_postural = 100;
-let status_postura = "POSTURA_CORRETA";
 
-//=====================================================
-// RECEPÇÃO DOS DADOS DO TAGOIO
-//=====================================================
+let status = "";
 
-window.addEventListener(
-
-"message",
-
-function(event){
-
-    try{
-
-        let dados =
-        event.data;
-
-        console.log(
-        "TAGOIO:",
-        dados
-        );
-
-        if(
-        dados == null
-        )
-        return;
-
-        if(
-        typeof dados
-        ==
-        "object"
-        ){
-
-            if(
-            dados.x_lombar
-            != undefined
-            )
-            x_lombar =
-            Number(
-            dados.x_lombar
-            );
-
-            if(
-            dados.y_lombar
-            != undefined
-            )
-            y_lombar =
-            Number(
-            dados.y_lombar
-            );
-
-            if(
-            dados.x_meio
-            != undefined
-            )
-            x_meio =
-            Number(
-            dados.x_meio
-            );
-
-            if(
-            dados.y_meio
-            != undefined
-            )
-            y_meio =
-            Number(
-            dados.y_meio
-            );
-
-            if(
-            dados.x_superior
-            != undefined
-            )
-            x_superior =
-            Number(
-            dados.x_superior
-            );
-
-            if(
-            dados.y_superior
-            != undefined
-            )
-            y_superior =
-            Number(
-            dados.y_superior
-            );
-
-            if(
-            dados.curvatura
-            != undefined
-            )
-            curvatura =
-            Number(
-            dados.curvatura
-            );
-
-            if(
-            dados.indice_postural
-            != undefined
-            )
-            indice_postural =
-            Number(
-            dados.indice_postural
-            );
-
-            if(
-            dados.status_postura
-            != undefined
-            )
-            status_postura =
-            dados.status_postura;
-
-        }
-
-    }
-
-    catch(e){
-
-        console.log(
-        e
-        );
-
-    }
-
-}
-
-);
-
-//=====================================================
-// CANVAS
-//=====================================================
+let contador = 0;
 
 const canvas =
-document.getElementById(
-"canvas"
-);
+document.getElementById("canvas");
 
 const ctx =
-canvas.getContext(
-"2d"
-);
-
-const escala = 18;
-
-//=====================================================
+canvas.getContext("2d");
 
 function desenhar(){
 
 ctx.clearRect(
 0,
 0,
-canvas.width,
-canvas.height
+500,
+500
 );
 
-let origemX =
-canvas.width/2;
+let origemX = 250;
+let origemY = 450;
 
-let origemY =
-500;
+let escala = 15;
 
 let p1x =
-origemX +
-x_lombar * escala;
+origemX + xLombar * escala;
 
 let p1y =
-origemY -
-y_lombar * escala;
+origemY - yLombar * escala;
 
 let p2x =
-origemX +
-x_meio * escala;
+origemX + xMeio * escala;
 
 let p2y =
-origemY -
-y_meio * escala;
+origemY - yMeio * escala;
 
 let p3x =
-origemX +
-x_superior * escala;
+origemX + xSuperior * escala;
 
 let p3y =
-origemY -
-y_superior * escala;
+origemY - ySuperior * escala;
 
-// eixo
+let cor = "green";
 
-ctx.beginPath();
+if(curvatura > 8)
+cor = "orange";
 
-ctx.moveTo(
-origemX,
-30
-);
+if(curvatura > 15)
+cor = "red";
 
-ctx.lineTo(
-origemX,
-510
-);
-
-ctx.lineWidth =
-2;
-
-ctx.strokeStyle =
-"#dddddd";
-
-ctx.stroke();
-
-// cor da coluna
-
-let cor =
-"#00aa00";
-
-if(
-curvatura > 8
-)
-cor =
-"#ffaa00";
-
-if(
-curvatura > 15
-)
-cor =
-"#cc0000";
-
-// linha
+ctx.lineWidth = 8;
+ctx.strokeStyle = cor;
 
 ctx.beginPath();
 
@@ -342,158 +137,118 @@ p3x,
 p3y
 );
 
-ctx.strokeStyle =
-cor;
-
-ctx.lineWidth =
-8;
-
 ctx.stroke();
 
-// lombar
+ctx.fillStyle = cor;
 
 ctx.beginPath();
-
-ctx.arc(
-p1x,
-p1y,
-12,
-0,
-Math.PI*2
-);
-
-ctx.fillStyle =
-cor;
-
+ctx.arc(p1x,p1y,12,0,2*Math.PI);
 ctx.fill();
 
-// meio
-
 ctx.beginPath();
-
-ctx.arc(
-p2x,
-p2y,
-12,
-0,
-Math.PI*2
-);
-
-ctx.fillStyle =
-cor;
-
+ctx.arc(p2x,p2y,12,0,2*Math.PI);
 ctx.fill();
 
-// superior
-
 ctx.beginPath();
-
-ctx.arc(
-p3x,
-p3y,
-12,
-0,
-Math.PI*2
-);
-
-ctx.fillStyle =
-cor;
-
+ctx.arc(p3x,p3y,12,0,2*Math.PI);
 ctx.fill();
 
 document
 .getElementById(
 "curvatura"
-)
-.innerHTML =
-curvatura.toFixed(
-2
-);
-
-document
-.getElementById(
-"indice"
-)
-.innerHTML =
-indice_postural.toFixed(
-0
-);
+).innerHTML =
+curvatura.toFixed(2);
 
 document
 .getElementById(
 "status"
-)
-.innerHTML =
-status_postura;
+).innerHTML =
+status;
+
+document
+.getElementById(
+"contador"
+).innerHTML =
+contador;
 
 }
 
-//=====================================================
-// ANIMAÇÃO DE BACKUP
-//=====================================================
-// Se o TagoIO não enviar dados,
-// pelo menos sabemos que o HTML abriu.
-//=====================================================
+async function atualizar(){
 
-let t = 0;
+try{
 
-setInterval(function(){
+const resposta =
+await fetch(
+URL,
+{
+headers:{
+"Device-Token":TOKEN
+}
+}
+);
 
-t += 0.05;
+const dados =
+await resposta.json();
 
-if(
-x_lombar == 0 &&
-x_meio == 0 &&
-x_superior == 0
-){
+dados.forEach(function(item){
 
-x_lombar = 0;
-y_lombar = 0;
+if(item.variable=="x_lombar")
+xLombar=
+Number(item.value);
 
-x_meio =
-Math.sin(
-t
-) * 1.5;
+if(item.variable=="y_lombar")
+yLombar=
+Number(item.value);
 
-y_meio =
-7.5;
+if(item.variable=="x_meio")
+xMeio=
+Number(item.value);
 
-x_superior =
-Math.sin(
-t
-) * 3;
+if(item.variable=="y_meio")
+yMeio=
+Number(item.value);
 
-y_superior =
-15;
+if(item.variable=="x_superior")
+xSuperior=
+Number(item.value);
 
-curvatura =
-Math.abs(
-x_superior
-) * 5;
+if(item.variable=="y_superior")
+ySuperior=
+Number(item.value);
 
-indice_postural =
-100 -
-curvatura * 3;
+if(item.variable=="curvatura")
+curvatura=
+Number(item.value);
 
-if(
-indice_postural < 0
-)
-indice_postural = 0;
+if(item.variable=="status_postura")
+status=
+item.value;
+
+if(item.variable=="contador_ma_postura")
+contador=
+Number(item.value);
+
+});
+
+desenhar();
+
+}
+catch(erro){
+
+console.log(erro);
+
+}
 
 }
 
 desenhar();
 
-},100);
-
-//=====================================================
-
-desenhar();
-
-//=====================================================
+setInterval(
+atualizar,
+3000
+);
 
 </script>
 
 </body>
-
 </html>
