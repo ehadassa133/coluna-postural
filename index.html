@@ -5,7 +5,6 @@
 <title>Monitoramento Postural</title>
 
 <style>
-
 body{
     margin:0;
     background:#f2f2f2;
@@ -28,9 +27,7 @@ canvas{
     margin-top:20px;
     font-size:20px;
 }
-
 </style>
-
 </head>
 
 <body>
@@ -40,136 +37,78 @@ canvas{
 <canvas id="canvas" width="500" height="500"></canvas>
 
 <div id="dados">
-
 <p>Curvatura: <span id="curvatura">0</span>°</p>
-
 <p>Status: <span id="status">-</span></p>
-
 <p>Má postura: <span id="contador">0</span></p>
-
 </div>
 
 <script>
 
 const TOKEN = "42a77494-7495-49db-a47e-ab234bbe00c9";
-
-const URL =
-"https://api.tago.io/data?query=last_value";
+const URL = "https://api.tago.io/data?query=last_value";
 
 let xLombar = 0;
 let yLombar = 0;
-
 let xMeio = 0;
 let yMeio = 7.5;
-
 let xSuperior = 0;
 let ySuperior = 15;
 
 let curvatura = 0;
-
 let status = "";
-
 let contador = 0;
 
-const canvas =
-document.getElementById("canvas");
-
-const ctx =
-canvas.getContext("2d");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
 function desenhar(){
 
-ctx.clearRect(
-0,
-0,
-500,
-500
-);
+ctx.clearRect(0, 0, 500, 500);
 
 let origemX = 250;
 let origemY = 450;
-
 let escala = 15;
 
-let p1x =
-origemX + xLombar * escala;
+let p1x = origemX + xLombar * escala;
+let p1y = origemY - yLombar * escala;
 
-let p1y =
-origemY - yLombar * escala;
+let p2x = origemX + xMeio * escala;
+let p2y = origemY - yMeio * escala;
 
-let p2x =
-origemX + xMeio * escala;
-
-let p2y =
-origemY - yMeio * escala;
-
-let p3x =
-origemX + xSuperior * escala;
-
-let p3y =
-origemY - ySuperior * escala;
+let p3x = origemX + xSuperior * escala;
+let p3y = origemY - ySuperior * escala;
 
 let cor = "green";
 
-if(curvatura > 8)
-cor = "orange";
-
-if(curvatura > 15)
-cor = "red";
+if(curvatura > 8) cor = "orange";
+if(curvatura > 15) cor = "red";
 
 ctx.lineWidth = 8;
 ctx.strokeStyle = cor;
 
 ctx.beginPath();
-
-ctx.moveTo(
-p1x,
-p1y
-);
-
-ctx.lineTo(
-p2x,
-p2y
-);
-
-ctx.lineTo(
-p3x,
-p3y
-);
-
+ctx.moveTo(p1x, p1y);
+ctx.lineTo(p2x, p2y);
+ctx.lineTo(p3x, p3y);
 ctx.stroke();
 
 ctx.fillStyle = cor;
 
 ctx.beginPath();
-ctx.arc(p1x,p1y,12,0,2*Math.PI);
+ctx.arc(p1x, p1y, 12, 0, 2*Math.PI);
 ctx.fill();
 
 ctx.beginPath();
-ctx.arc(p2x,p2y,12,0,2*Math.PI);
+ctx.arc(p2x, p2y, 12, 0, 2*Math.PI);
 ctx.fill();
 
 ctx.beginPath();
-ctx.arc(p3x,p3y,12,0,2*Math.PI);
+ctx.arc(p3x, p3y, 12, 0, 2*Math.PI);
 ctx.fill();
 
-document
-.getElementById(
-"curvatura"
-).innerHTML =
-curvatura.toFixed(2);
-
-document
-.getElementById(
-"status"
-).innerHTML =
-status;
-
-document
-.getElementById(
-"contador"
-).innerHTML =
-contador;
+document.getElementById("curvatura").innerHTML = curvatura.toFixed(2);
+document.getElementById("status").innerHTML = status;
+document.getElementById("contador").innerHTML = contador;
 
 }
 
@@ -177,77 +116,44 @@ async function atualizar(){
 
 try{
 
-const resposta =
-await fetch(
-URL,
-{
-headers:{
-"Device-Token":TOKEN
+const resposta = await fetch(URL, {
+headers: {
+"Device-Token": TOKEN
 }
-}
-);
-
-const dados =
-await resposta.json();
-console.log(dados);
-console.log("RESPOSTA BRUTA:", await resposta.text());
-dados.result.forEach(function(item){
-
-if(item.variable=="x_lombar")
-xLombar=
-Number(item.value);
-
-if(item.variable=="y_lombar")
-yLombar=
-Number(item.value);
-
-if(item.variable=="x_meio")
-xMeio=
-Number(item.value);
-
-if(item.variable=="y_meio")
-yMeio=
-Number(item.value);
-
-if(item.variable=="x_superior")
-xSuperior=
-Number(item.value);
-
-if(item.variable=="y_superior")
-ySuperior=
-Number(item.value);
-
-if(item.variable=="curvatura")
-curvatura=
-Number(item.value);
-
-if(item.variable=="status_postura")
-status=
-item.value;
-
-if(item.variable=="contador_ma_postura")
-contador=
-Number(item.value);
-
 });
+
+const dados = await resposta.json();
+
+console.log("DADOS:", dados);
+
+const mapa = {};
+
+dados.result.forEach(item => {
+mapa[item.variable] = item.value;
+});
+
+xLombar = Number(mapa.x_lombar || 0);
+yLombar = Number(mapa.y_lombar || 0);
+xMeio = Number(mapa.x_meio || 0);
+yMeio = Number(mapa.y_meio || 7.5);
+xSuperior = Number(mapa.x_superior || 0);
+ySuperior = Number(mapa.y_superior || 15);
+
+curvatura = Number(mapa.curvatura || 0);
+status = mapa.status_postura || "-";
+contador = Number(mapa.contador_ma_postura || 0);
 
 desenhar();
 
 }
 catch(erro){
-
-console.log(erro);
-
+console.log("ERRO:", erro);
 }
 
 }
 
 desenhar();
-
-setInterval(
-atualizar,
-3000
-);
+setInterval(atualizar, 3000);
 
 </script>
 
