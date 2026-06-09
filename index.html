@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Coluna Postural</title>
+
+<style>
+
+body{
+    margin:0;
+    background:#f2f2f2;
+    font-family:Arial;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+#painel{
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0px 0px 15px rgba(0,0,0,0.2);
+    text-align:center;
+}
+
+h2{
+    margin-top:0;
+}
+
+canvas{
+    border:1px solid #cccccc;
+    background:white;
+}
+
+#dados{
+    margin-top:15px;
+    font-size:18px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="painel">
+
+<h2>Monitoramento Postural</h2>
+
+<canvas
+id="canvas"
+width="400"
+height="500">
+</canvas>
+
+<div id="dados">
+
+<div>
+Curvatura:
+<span id="curvatura">0</span>°
+</div>
+
+<div>
+Índice Postural:
+<span id="indice">100</span>%
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+//========================================
+// VALORES DE TESTE
+// DEPOIS VAMOS SUBSTITUIR PELO TAGOIO
+//========================================
+
+let xLombar = 0;
+let yLombar = 0;
+
+let xMeio = 0;
+let yMeio = 7.5;
+
+let xSuperior = 0;
+let ySuperior = 15;
+
+let curvatura = 0;
+let indice = 100;
+
+//========================================
+
+const canvas =
+document.getElementById("canvas");
+
+const ctx =
+canvas.getContext("2d");
+
+const escala = 15;
+
+//========================================
+
+function desenhar(){
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    let origemX =
+    canvas.width/2;
+
+    let origemY =
+    450;
+
+    let p1x =
+    origemX +
+    xLombar * escala;
+
+    let p1y =
+    origemY -
+    yLombar * escala;
+
+    let p2x =
+    origemX +
+    xMeio * escala;
+
+    let p2y =
+    origemY -
+    yMeio * escala;
+
+    let p3x =
+    origemX +
+    xSuperior * escala;
+
+    let p3y =
+    origemY -
+    ySuperior * escala;
+
+    // eixo
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        origemX,
+        40
+    );
+
+    ctx.lineTo(
+        origemX,
+        460
+    );
+
+    ctx.strokeStyle =
+    "#dddddd";
+
+    ctx.lineWidth = 2;
+
+    ctx.stroke();
+
+    // coluna
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        p1x,
+        p1y
+    );
+
+    ctx.lineTo(
+        p2x,
+        p2y
+    );
+
+    ctx.lineTo(
+        p3x,
+        p3y
+    );
+
+    ctx.strokeStyle =
+    "#1565c0";
+
+    ctx.lineWidth = 8;
+
+    ctx.stroke();
+
+    // lombar
+
+    ctx.beginPath();
+
+    ctx.arc(
+        p1x,
+        p1y,
+        12,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fillStyle =
+    "#43a047";
+
+    ctx.fill();
+
+    // meio
+
+    ctx.beginPath();
+
+    ctx.arc(
+        p2x,
+        p2y,
+        12,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fillStyle =
+    "#f9a825";
+
+    ctx.fill();
+
+    // superior
+
+    ctx.beginPath();
+
+    ctx.arc(
+        p3x,
+        p3y,
+        12,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fillStyle =
+    "#e53935";
+
+    ctx.fill();
+
+    document
+    .getElementById(
+    "curvatura")
+    .innerHTML =
+    curvatura.toFixed(2);
+
+    document
+    .getElementById(
+    "indice")
+    .innerHTML =
+    indice.toFixed(0);
+
+}
+
+//========================================
+// SIMULAÇÃO
+// DEPOIS VAMOS TROCAR PELO TAGOIO
+//========================================
+
+let t = 0;
+
+setInterval(function(){
+
+    t += 0.1;
+
+    xLombar =
+    0;
+
+    yLombar =
+    0;
+
+    xMeio =
+    Math.sin(t)*1.5;
+
+    yMeio =
+    7.5;
+
+    xSuperior =
+    Math.sin(t)*3;
+
+    ySuperior =
+    15;
+
+    curvatura =
+    Math.abs(
+    xSuperior
+    )*5;
+
+    indice =
+    100 -
+    curvatura*3;
+
+    if(indice < 0)
+        indice = 0;
+
+    desenhar();
+
+},100);
+
+</script>
+
+</body>
+
+</html>
