@@ -190,8 +190,7 @@ headers:{
 const dados =
 await resposta.json();
 console.log(dados);
-
-dados.forEach(function(item){
+dados.result.forEach(function(item){
 
 if(item.variable=="x_lombar")
 xLombar=
