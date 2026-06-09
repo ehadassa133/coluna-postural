@@ -11,34 +11,30 @@
 
 body{
     margin:0;
+    overflow:hidden;
     background:#f2f2f2;
     font-family:Arial;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
 }
 
 #painel{
-    background:white;
-    padding:20px;
-    border-radius:15px;
-    box-shadow:0px 0px 15px rgba(0,0,0,0.2);
-    text-align:center;
-}
-
-h2{
-    margin-top:0;
+    width:100vw;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
 }
 
 canvas{
-    border:1px solid #cccccc;
     background:white;
+    border:1px solid #cccccc;
+    border-radius:10px;
 }
 
-#dados{
-    margin-top:15px;
+#texto{
+    margin-top:10px;
     font-size:18px;
+    text-align:center;
 }
 
 </style>
@@ -49,24 +45,28 @@ canvas{
 
 <div id="painel">
 
-<h2>Monitoramento Postural</h2>
-
 <canvas
 id="canvas"
 width="400"
 height="500">
 </canvas>
 
-<div id="dados">
+<div id="texto">
 
 <div>
 Curvatura:
-<span id="curvatura">0</span>°
+<span id="curvatura">
+0
+</span>
+°
 </div>
 
 <div>
-Índice Postural:
-<span id="indice">100</span>%
+Índice:
+<span id="indice">
+100
+</span>
+%
 </div>
 
 </div>
@@ -75,10 +75,29 @@ Curvatura:
 
 <script>
 
-//========================================
-// VALORES DE TESTE
-// DEPOIS VAMOS SUBSTITUIR PELO TAGOIO
-//========================================
+//==================================
+// RECEBE DADOS DO TAGOIO
+//==================================
+
+window.addEventListener(
+"message",
+function(event){
+
+    try{
+
+        console.log(
+        event.data
+        );
+
+    }
+    catch(e){}
+
+}
+);
+
+//==================================
+// VALORES INICIAIS
+//==================================
 
 let xLombar = 0;
 let yLombar = 0;
@@ -92,213 +111,235 @@ let ySuperior = 15;
 let curvatura = 0;
 let indice = 100;
 
-//========================================
+//==================================
 
 const canvas =
-document.getElementById("canvas");
+document.getElementById(
+"canvas"
+);
 
 const ctx =
-canvas.getContext("2d");
+canvas.getContext(
+"2d"
+);
 
 const escala = 15;
 
-//========================================
+//==================================
 
 function desenhar(){
 
-    ctx.clearRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
+ctx.clearRect(
+0,
+0,
+canvas.width,
+canvas.height
+);
 
-    let origemX =
-    canvas.width/2;
+let origemX =
+canvas.width/2;
 
-    let origemY =
-    450;
+let origemY =
+450;
 
-    let p1x =
-    origemX +
-    xLombar * escala;
+let p1x =
+origemX +
+xLombar * escala;
 
-    let p1y =
-    origemY -
-    yLombar * escala;
+let p1y =
+origemY -
+yLombar * escala;
 
-    let p2x =
-    origemX +
-    xMeio * escala;
+let p2x =
+origemX +
+xMeio * escala;
 
-    let p2y =
-    origemY -
-    yMeio * escala;
+let p2y =
+origemY -
+yMeio * escala;
 
-    let p3x =
-    origemX +
-    xSuperior * escala;
+let p3x =
+origemX +
+xSuperior * escala;
 
-    let p3y =
-    origemY -
-    ySuperior * escala;
+let p3y =
+origemY -
+ySuperior * escala;
 
-    // eixo
+// eixo
 
-    ctx.beginPath();
+ctx.beginPath();
 
-    ctx.moveTo(
-        origemX,
-        40
-    );
+ctx.moveTo(
+origemX,
+20
+);
 
-    ctx.lineTo(
-        origemX,
-        460
-    );
+ctx.lineTo(
+origemX,
+470
+);
 
-    ctx.strokeStyle =
-    "#dddddd";
+ctx.strokeStyle =
+"#dddddd";
 
-    ctx.lineWidth = 2;
+ctx.lineWidth =
+2;
 
-    ctx.stroke();
+ctx.stroke();
 
-    // coluna
+// coluna
 
-    ctx.beginPath();
+ctx.beginPath();
 
-    ctx.moveTo(
-        p1x,
-        p1y
-    );
+ctx.moveTo(
+p1x,
+p1y
+);
 
-    ctx.lineTo(
-        p2x,
-        p2y
-    );
+ctx.lineTo(
+p2x,
+p2y
+);
 
-    ctx.lineTo(
-        p3x,
-        p3y
-    );
+ctx.lineTo(
+p3x,
+p3y
+);
 
-    ctx.strokeStyle =
-    "#1565c0";
+ctx.strokeStyle =
+"#1565c0";
 
-    ctx.lineWidth = 8;
+ctx.lineWidth =
+8;
 
-    ctx.stroke();
+ctx.stroke();
 
-    // lombar
+// lombar
 
-    ctx.beginPath();
+ctx.beginPath();
 
-    ctx.arc(
-        p1x,
-        p1y,
-        12,
-        0,
-        Math.PI*2
-    );
+ctx.arc(
+p1x,
+p1y,
+12,
+0,
+Math.PI*2
+);
 
-    ctx.fillStyle =
-    "#43a047";
+ctx.fillStyle =
+"#43a047";
 
-    ctx.fill();
+ctx.fill();
 
-    // meio
+// meio
 
-    ctx.beginPath();
+ctx.beginPath();
 
-    ctx.arc(
-        p2x,
-        p2y,
-        12,
-        0,
-        Math.PI*2
-    );
+ctx.arc(
+p2x,
+p2y,
+12,
+0,
+Math.PI*2
+);
 
-    ctx.fillStyle =
-    "#f9a825";
+ctx.fillStyle =
+"#fbc02d";
 
-    ctx.fill();
+ctx.fill();
 
-    // superior
+// superior
 
-    ctx.beginPath();
+ctx.beginPath();
 
-    ctx.arc(
-        p3x,
-        p3y,
-        12,
-        0,
-        Math.PI*2
-    );
+ctx.arc(
+p3x,
+p3y,
+12,
+0,
+Math.PI*2
+);
 
-    ctx.fillStyle =
-    "#e53935";
+ctx.fillStyle =
+"#d32f2f";
 
-    ctx.fill();
+ctx.fill();
 
-    document
-    .getElementById(
-    "curvatura")
-    .innerHTML =
-    curvatura.toFixed(2);
+// texto
 
-    document
-    .getElementById(
-    "indice")
-    .innerHTML =
-    indice.toFixed(0);
+document
+.getElementById(
+"curvatura"
+)
+.innerHTML =
+curvatura.toFixed(
+2
+);
+
+document
+.getElementById(
+"indice"
+)
+.innerHTML =
+indice.toFixed(
+0
+);
 
 }
 
-//========================================
-// SIMULAÇÃO
-// DEPOIS VAMOS TROCAR PELO TAGOIO
-//========================================
+//==================================
+// ANIMAÇÃO DE TESTE
+//==================================
 
 let t = 0;
 
 setInterval(function(){
 
-    t += 0.1;
+t += 0.1;
 
-    xLombar =
-    0;
+xLombar = 0;
+yLombar = 0;
 
-    yLombar =
-    0;
+xMeio =
+Math.sin(
+t
+) * 1.5;
 
-    xMeio =
-    Math.sin(t)*1.5;
+yMeio =
+7.5;
 
-    yMeio =
-    7.5;
+xSuperior =
+Math.sin(
+t
+) * 3;
 
-    xSuperior =
-    Math.sin(t)*3;
+ySuperior =
+15;
 
-    ySuperior =
-    15;
+curvatura =
+Math.abs(
+xSuperior
+) * 5;
 
-    curvatura =
-    Math.abs(
-    xSuperior
-    )*5;
+indice =
+100 -
+curvatura * 3;
 
-    indice =
-    100 -
-    curvatura*3;
+if(
+indice < 0
+)
+indice = 0;
 
-    if(indice < 0)
-        indice = 0;
-
-    desenhar();
+desenhar();
 
 },100);
+
+//==================================
+
+desenhar();
+
+//==================================
 
 </script>
 
