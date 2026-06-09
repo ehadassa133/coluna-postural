@@ -1,51 +1,9 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-<meta charset="UTF-8">
-<title>Monitoramento Postural</title>
-
-<style>
-body{
-    margin:0;
-    background:#f2f2f2;
-    font-family:Arial;
-    text-align:center;
-}
-
-h2{
-    margin-top:20px;
-}
-
-canvas{
-    background:white;
-    margin-top:20px;
-    border-radius:10px;
-    box-shadow:0px 0px 10px rgba(0,0,0,0.2);
-}
-
-#dados{
-    margin-top:20px;
-    font-size:20px;
-}
-</style>
-</head>
-
-<body>
-
-<h2>Monitoramento Postural</h2>
-
-<canvas id="canvas" width="500" height="500"></canvas>
-
-<div id="dados">
-<p>Curvatura: <span id="curvatura">0</span>°</p>
-<p>Status: <span id="status">-</span></p>
-<p>Má postura: <span id="contador">0</span></p>
-</div>
-
 <script>
 
-const TOKEN = "42a77494-7495-49db-a47e-ab234bbe00c9";
-const URL = "https://api.tago.io/data?variables=x_lombar,y_lombar,x_meio,y_meio,x_superior,y_superior,curvatura,status_postura,contador_ma_postura&qty=50";
+const TOKEN = "0b04c72a-a225-4171-b32b-d3adf122c3ec";
+const URL = "https://api.tago.io/data?qty=50";
+
+// 🔥 DECLARE TODAS AS VARIÁVEIS
 let xLombar = 0;
 let yLombar = 0;
 let xMeio = 0;
@@ -125,9 +83,12 @@ const dados = await resposta.json();
 
 console.log("DADOS:", dados);
 
+// 🔥 PROTEÇÃO (NÃO QUEBRA SE VIER VAZIO)
+const lista = dados.result || [];
+
 const mapa = {};
 
-dados.result.forEach(item => {
+lista.forEach(item => {
 mapa[item.variable] = item.value;
 });
 
@@ -155,6 +116,3 @@ desenhar();
 setInterval(atualizar, 3000);
 
 </script>
-
-</body>
-</html>
