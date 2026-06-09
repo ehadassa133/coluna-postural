@@ -46,10 +46,10 @@ canvas{
 
 document.addEventListener("DOMContentLoaded", function() {
 
-const TOKEN = "0b04c72a-a225-4171-b32b-d3adf122c3ec";
+const TOKEN = "SEU_TOKEN_AQUI";
 const URL = "https://api.tago.io/data?qty=50";
 
-// variáveis
+// dados
 let xLombar = 0;
 let yLombar = 0;
 let xMeio = 0;
@@ -65,29 +65,40 @@ let contador = 0;
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// desenhar
+// desenho
 function desenhar(){
 
 ctx.clearRect(0, 0, 500, 500);
 
-let origemX = 250;
-let origemY = 450;
 let escala = 15;
 
-let p1x = origemX + xLombar * escala;
-let p1y = origemY - yLombar * escala;
+// 🔥 PONTO BASE FIXO (NÃO MUDA MAIS)
+let baseX = 250;
+let baseY = 450;
 
-let p2x = origemX + xMeio * escala;
-let p2y = origemY - yMeio * escala;
+// diferença RELATIVA (remove “andar” da pessoa)
+let dxMeio = (xMeio - xLombar) * escala;
+let dyMeio = (yMeio - yLombar) * escala;
 
-let p3x = origemX + xSuperior * escala;
-let p3y = origemY - ySuperior * escala;
+let dxSup = (xSuperior - xLombar) * escala;
+let dySup = (ySuperior - yLombar) * escala;
 
+// pontos
+let p1x = baseX;
+let p1y = baseY;
+
+let p2x = baseX + dxMeio;
+let p2y = baseY - dyMeio;
+
+let p3x = baseX + dxSup;
+let p3y = baseY - dySup;
+
+// cor por curvatura
 let cor = "green";
-
 if(curvatura > 8) cor = "orange";
 if(curvatura > 15) cor = "red";
 
+// linha
 ctx.lineWidth = 8;
 ctx.strokeStyle = cor;
 
@@ -97,6 +108,7 @@ ctx.lineTo(p2x, p2y);
 ctx.lineTo(p3x, p3y);
 ctx.stroke();
 
+// pontos
 ctx.fillStyle = cor;
 
 ctx.beginPath();
@@ -111,13 +123,14 @@ ctx.beginPath();
 ctx.arc(p3x, p3y, 12, 0, 2*Math.PI);
 ctx.fill();
 
+// UI
 document.getElementById("curvatura").innerHTML = curvatura.toFixed(2);
 document.getElementById("status").innerHTML = status;
 document.getElementById("contador").innerHTML = contador;
 
 }
 
-// atualizar TagoIO
+// update API
 async function atualizar(){
 
 try{
@@ -130,10 +143,7 @@ headers: {
 
 const dados = await resposta.json();
 
-console.log("DADOS:", dados);
-
 const lista = dados.result || [];
-
 const mapa = {};
 
 lista.forEach(item => {
@@ -154,8 +164,8 @@ contador = Number(mapa.contador_ma_postura || 0);
 desenhar();
 
 }
-catch(erro){
-console.log("ERRO:", erro);
+catch(err){
+console.log(err);
 }
 
 }
