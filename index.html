@@ -11,30 +11,32 @@
 
 body{
     margin:0;
-    overflow:hidden;
+    padding:0;
     background:#f2f2f2;
+    overflow:hidden;
     font-family:Arial;
 }
 
-#painel{
+#container{
     width:100vw;
     height:100vh;
     display:flex;
-    flex-direction:column;
     justify-content:center;
     align-items:center;
+    flex-direction:column;
 }
 
 canvas{
     background:white;
-    border:1px solid #cccccc;
-    border-radius:10px;
+    border-radius:15px;
+    box-shadow:0px 0px 15px rgba(0,0,0,0.15);
 }
 
-#texto{
-    margin-top:10px;
-    font-size:18px;
+#info{
+    margin-top:15px;
     text-align:center;
+    font-size:18px;
+    font-weight:bold;
 }
 
 </style>
@@ -43,15 +45,15 @@ canvas{
 
 <body>
 
-<div id="painel">
+<div id="container">
 
 <canvas
 id="canvas"
-width="400"
-height="500">
+width="450"
+height="550">
 </canvas>
 
-<div id="texto">
+<div id="info">
 
 <div>
 Curvatura:
@@ -62,11 +64,18 @@ Curvatura:
 </div>
 
 <div>
-Índice:
+Índice Postural:
 <span id="indice">
 100
 </span>
 %
+</div>
+
+<div>
+Status:
+<span id="status">
+POSTURA_CORRETA
+</span>
 </div>
 
 </div>
@@ -75,43 +84,152 @@ Curvatura:
 
 <script>
 
-//==================================
-// RECEBE DADOS DO TAGOIO
-//==================================
+//=====================================================
+// VARIÁVEIS
+//=====================================================
+
+let x_lombar = 0;
+let y_lombar = 0;
+
+let x_meio = 0;
+let y_meio = 7.5;
+
+let x_superior = 0;
+let y_superior = 15;
+
+let curvatura = 0;
+let indice_postural = 100;
+let status_postura = "POSTURA_CORRETA";
+
+//=====================================================
+// RECEPÇÃO DOS DADOS DO TAGOIO
+//=====================================================
 
 window.addEventListener(
+
 "message",
+
 function(event){
 
     try{
 
+        let dados =
+        event.data;
+
         console.log(
-        event.data
+        "TAGOIO:",
+        dados
+        );
+
+        if(
+        dados == null
+        )
+        return;
+
+        if(
+        typeof dados
+        ==
+        "object"
+        ){
+
+            if(
+            dados.x_lombar
+            != undefined
+            )
+            x_lombar =
+            Number(
+            dados.x_lombar
+            );
+
+            if(
+            dados.y_lombar
+            != undefined
+            )
+            y_lombar =
+            Number(
+            dados.y_lombar
+            );
+
+            if(
+            dados.x_meio
+            != undefined
+            )
+            x_meio =
+            Number(
+            dados.x_meio
+            );
+
+            if(
+            dados.y_meio
+            != undefined
+            )
+            y_meio =
+            Number(
+            dados.y_meio
+            );
+
+            if(
+            dados.x_superior
+            != undefined
+            )
+            x_superior =
+            Number(
+            dados.x_superior
+            );
+
+            if(
+            dados.y_superior
+            != undefined
+            )
+            y_superior =
+            Number(
+            dados.y_superior
+            );
+
+            if(
+            dados.curvatura
+            != undefined
+            )
+            curvatura =
+            Number(
+            dados.curvatura
+            );
+
+            if(
+            dados.indice_postural
+            != undefined
+            )
+            indice_postural =
+            Number(
+            dados.indice_postural
+            );
+
+            if(
+            dados.status_postura
+            != undefined
+            )
+            status_postura =
+            dados.status_postura;
+
+        }
+
+    }
+
+    catch(e){
+
+        console.log(
+        e
         );
 
     }
-    catch(e){}
 
 }
-);
 
-//==================================
-// VALORES INICIAIS
-//==================================
+//);
 
-let xLombar = 0;
-let yLombar = 0;
-
-let xMeio = 0;
-let yMeio = 7.5;
-
-let xSuperior = 0;
-let ySuperior = 15;
-
-let curvatura = 0;
-let indice = 100;
-
-//==================================
+//=====================================================
+// CANVAS
+//=====================================================
 
 const canvas =
 document.getElementById(
@@ -123,9 +241,9 @@ canvas.getContext(
 "2d"
 );
 
-const escala = 15;
+const escala = 18;
 
-//==================================
+//=====================================================
 
 function desenhar(){
 
@@ -140,31 +258,31 @@ let origemX =
 canvas.width/2;
 
 let origemY =
-450;
+500;
 
 let p1x =
 origemX +
-xLombar * escala;
+x_lombar * escala;
 
 let p1y =
 origemY -
-yLombar * escala;
+y_lombar * escala;
 
 let p2x =
 origemX +
-xMeio * escala;
+x_meio * escala;
 
 let p2y =
 origemY -
-yMeio * escala;
+y_meio * escala;
 
 let p3x =
 origemX +
-xSuperior * escala;
+x_superior * escala;
 
 let p3y =
 origemY -
-ySuperior * escala;
+y_superior * escala;
 
 // eixo
 
@@ -172,23 +290,40 @@ ctx.beginPath();
 
 ctx.moveTo(
 origemX,
-20
+30
 );
 
 ctx.lineTo(
 origemX,
-470
+510
 );
-
-ctx.strokeStyle =
-"#dddddd";
 
 ctx.lineWidth =
 2;
 
+ctx.strokeStyle =
+"#dddddd";
+
 ctx.stroke();
 
-// coluna
+// cor da coluna
+
+let cor =
+"#00aa00";
+
+if(
+curvatura > 8
+)
+cor =
+"#ffaa00";
+
+if(
+curvatura > 15
+)
+cor =
+"#cc0000";
+
+// linha
 
 ctx.beginPath();
 
@@ -208,7 +343,7 @@ p3y
 );
 
 ctx.strokeStyle =
-"#1565c0";
+cor;
 
 ctx.lineWidth =
 8;
@@ -228,7 +363,7 @@ Math.PI*2
 );
 
 ctx.fillStyle =
-"#43a047";
+cor;
 
 ctx.fill();
 
@@ -245,7 +380,7 @@ Math.PI*2
 );
 
 ctx.fillStyle =
-"#fbc02d";
+cor;
 
 ctx.fill();
 
@@ -262,11 +397,9 @@ Math.PI*2
 );
 
 ctx.fillStyle =
-"#d32f2f";
+cor;
 
 ctx.fill();
-
-// texto
 
 document
 .getElementById(
@@ -282,64 +415,82 @@ document
 "indice"
 )
 .innerHTML =
-indice.toFixed(
+indice_postural.toFixed(
 0
 );
 
+document
+.getElementById(
+"status"
+)
+.innerHTML =
+status_postura;
+
 }
 
-//==================================
-// ANIMAÇÃO DE TESTE
-//==================================
+//=====================================================
+// ANIMAÇÃO DE BACKUP
+//=====================================================
+// Se o TagoIO não enviar dados,
+// pelo menos sabemos que o HTML abriu.
+//=====================================================
 
 let t = 0;
 
 setInterval(function(){
 
-t += 0.1;
+t += 0.05;
 
-xLombar = 0;
-yLombar = 0;
+if(
+x_lombar == 0 &&
+x_meio == 0 &&
+x_superior == 0
+){
 
-xMeio =
+x_lombar = 0;
+y_lombar = 0;
+
+x_meio =
 Math.sin(
 t
 ) * 1.5;
 
-yMeio =
+y_meio =
 7.5;
 
-xSuperior =
+x_superior =
 Math.sin(
 t
 ) * 3;
 
-ySuperior =
+y_superior =
 15;
 
 curvatura =
 Math.abs(
-xSuperior
+x_superior
 ) * 5;
 
-indice =
+indice_postural =
 100 -
 curvatura * 3;
 
 if(
-indice < 0
+indice_postural < 0
 )
-indice = 0;
+indice_postural = 0;
+
+}
 
 desenhar();
 
 },100);
 
-//==================================
+//=====================================================
 
 desenhar();
 
-//==================================
+//=====================================================
 
 </script>
 
