@@ -1,9 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Monitoramento Postural</title>
+
+<style>
+body{
+    margin:0;
+    background:#f2f2f2;
+    font-family:Arial;
+    text-align:center;
+}
+
+h2{
+    margin-top:20px;
+}
+
+canvas{
+    background:white;
+    margin-top:20px;
+    border-radius:10px;
+    box-shadow:0px 0px 10px rgba(0,0,0,0.2);
+}
+
+#dados{
+    margin-top:20px;
+    font-size:20px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Monitoramento Postural</h2>
+
+<canvas id="canvas" width="500" height="500"></canvas>
+
+<div id="dados">
+<p>Curvatura: <span id="curvatura">0</span>°</p>
+<p>Status: <span id="status">-</span></p>
+<p>Má postura: <span id="contador">0</span></p>
+</div>
+
 <script>
+
+document.addEventListener("DOMContentLoaded", function() {
 
 const TOKEN = "0b04c72a-a225-4171-b32b-d3adf122c3ec";
 const URL = "https://api.tago.io/data?qty=50";
 
-// 🔥 DECLARE TODAS AS VARIÁVEIS
+// variáveis
 let xLombar = 0;
 let yLombar = 0;
 let xMeio = 0;
@@ -15,9 +61,11 @@ let curvatura = 0;
 let status = "";
 let contador = 0;
 
+// canvas
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+// desenhar
 function desenhar(){
 
 ctx.clearRect(0, 0, 500, 500);
@@ -69,6 +117,7 @@ document.getElementById("contador").innerHTML = contador;
 
 }
 
+// atualizar TagoIO
 async function atualizar(){
 
 try{
@@ -83,7 +132,6 @@ const dados = await resposta.json();
 
 console.log("DADOS:", dados);
 
-// 🔥 PROTEÇÃO (NÃO QUEBRA SE VIER VAZIO)
 const lista = dados.result || [];
 
 const mapa = {};
@@ -112,7 +160,13 @@ console.log("ERRO:", erro);
 
 }
 
+// start
 desenhar();
 setInterval(atualizar, 3000);
 
+});
+
 </script>
+
+</body>
+</html>
